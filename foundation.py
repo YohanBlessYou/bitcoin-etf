@@ -23,15 +23,26 @@ server_url = {
 
 def error_handling(res):
     res_json = res.json()
-    if res.status_code == 200:
+    if res.status_code == 200 or res.status_code == 201:
         return
-    if res.status_code == 201:
-        return
-    if res.status_code == 400:
-        print("")
-        print("\033[31m"+"<<Error>> : " + res_json['error']['message'])
-        print("\033[0m")
-    elif res.status_code != 200:
+
+    if res.status_code > 201 and res.status_code < 400:
         print("")
         print("\033[34m"+"<<" + str(res.status_code) + ">>")
+        print("\033[0m")
+
+    if res.status_code >= 400:
+        print("")
+        print("\033[31m"+"<<Error"+str(res.status_code)+">> : " + res_json['error']['message'])
+        print("\033[0m")
+
+def error_handling_with_query(res, query):
+    error_handling(res)
+    if res.status_code > 201 and res.status_code < 400:
+        print("\033[34m")
+        print(query)
+        print("\033[0m")
+    if res.status_code >= 400:
+        print("\033[31m")
+        print(query)
         print("\033[0m")

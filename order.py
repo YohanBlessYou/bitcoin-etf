@@ -1,11 +1,11 @@
 from foundation import *
-from order_list import *
-from cash_info import *
-from market_price import *
+from account import *
+from krw_balance import *
+from market_info import *
 from time import sleep
 
 def cancel_all_order():
-    orders = get_order_uuid_list()
+    orders = get_my_order_uuid_list()
     for order in orders:
         query = {
             'uuid': order,
@@ -35,7 +35,7 @@ def cancel_all_order():
 
 
 def get_converted_order_list_for_sell():
-    account_json = show_total_account_info()
+    account_json = show_total_my_account_info_with_print()
 
     ticker_list = []
 
@@ -55,6 +55,7 @@ def get_converted_order_list_for_sell():
 def sell_all():
 
     cancel_all_order()
+    sleep(1)
 
     order_list = get_converted_order_list_for_sell()
 
@@ -89,31 +90,21 @@ def sell_all():
 
         res_json = res.json()
 
-        error_handling(res)
+        error_handling_with_query(res, query)
 
 
 def get_converted_order_list_for_buy():
-    coin_list_json = get_all_krw_coin_list()
 
-    temp_coin_list_json = coin_list_json
-    already_having_coin_list = show_total_account_info()
+    coin_list_json = get_dont_have_coin_list()
 
-    # remove coins having already from list
-    for target_coin in coin_list_json:
-        for having_coin in already_having_coin_list:
-            if target_coin['market'] == "KRW-"+having_coin['currency']:
-                temp_coin_list_json.remove(target_coin)
-    
-    coin_list_json = temp_coin_list_json
-
-    my_total_cash = get_available_cash()
+    my_total_cash = get_my_available_cash()
     cash_for_each = int(my_total_cash/len(coin_list_json))
 
     print("")
     print("\033[32m")
-    print("total : "+str(my_total_cash))
-    print("각 : "+str(cash_for_each))
-    print("코인 수 : "+str(len(coin_list_json)))
+    print("현재 KRW 잔고 : "+str(my_total_cash)+"원")
+    print("각 : "+str(cash_for_each)+"원")
+    print("구매 코인 수 : "+str(len(coin_list_json))+"개")
     print("\033[0m")
 
     ticker_list = []
@@ -135,6 +126,7 @@ def get_converted_order_list_for_buy():
 def buy_etf():
 
     cancel_all_order()
+    sleep(1)
 
     order_list = get_converted_order_list_for_buy()
 
@@ -169,6 +161,6 @@ def buy_etf():
 
         res_json = res.json()
 
-        error_handling(res)
+        error_handling_with_query(res, query)
 
     print("구매가 완료되었습니다")
