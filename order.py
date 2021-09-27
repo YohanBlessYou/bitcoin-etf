@@ -93,16 +93,32 @@ def sell_all():
         error_handling_with_query(res, query)
 
 
-def get_converted_order_list_for_buy():
 
-    coin_list_json = get_dont_have_coin_list()
+def get_coin_list(option):
+    if option == 1: #전체 자산으로 분배
+        return get_dont_have_coin_list()
+    elif option == 2: #남은 KRW로 분배
+        return get_all_krw_coin_list()
+    elif option == 3: #특정 금액으로 분배
+        return get_dont_have_coin_list()
 
-    my_total_cash = get_my_available_cash()
-    cash_for_each = int(my_total_cash/len(coin_list_json))
+def get_available_cash(option):
+    if option == 1: #전체 자산으로 분배
+        return get_my_available_cash()
+    elif option == 2: #남은 KRW로 분배
+        return get_my_available_cash()
+    elif option == 3: #특정 금액으로 분배
+        return int(input("금액을 입력하세요 : "))
+
+def get_converted_order_list_for_buy(option):
+
+    coin_list_json = get_coin_list(option)
+    available_cash = get_available_cash(option)
+    cash_for_each = int(available_cash/len(coin_list_json))
 
     print("")
     print("\033[32m")
-    print("현재 KRW 잔고 : "+str(my_total_cash)+"원")
+    print("현재 KRW 잔고 : "+str(available_cash)+"원")
     print("각 : "+str(cash_for_each)+"원")
     print("구매 코인 수 : "+str(len(coin_list_json))+"개")
     print("\033[0m")
@@ -123,12 +139,12 @@ def get_converted_order_list_for_buy():
     return ticker_list
 
 
-def buy_etf():
+def buy_etf(option):
 
     cancel_all_order()
     sleep(1)
 
-    order_list = get_converted_order_list_for_buy()
+    order_list = get_converted_order_list_for_buy(int(option))
 
     for coin in order_list:
         sleep(0.2)

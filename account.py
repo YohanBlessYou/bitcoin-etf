@@ -37,6 +37,32 @@ def show_total_my_account_info_with_print():
 
 
 
+
+def get_my_total_current_amount():
+    balance_list = show_total_my_account_info()
+
+    account_list = []
+
+    for coin in balance_list:
+        if coin['currency'] == "KRW":
+            continue
+        current_price = get_current_price("KRW-" + coin['currency'])
+        account_instance = {
+            'currency': coin['currency'],
+            'balance': coin['balance'],
+            'current_price': current_price
+        }
+        account_list.append(account_instance)
+
+    current_account = 0
+    for coin in account_list:
+        current_account += float(coin['balance'])*coin['current_price']
+    
+    return current_account
+
+
+
+
 def get_my_order_list(order_type):
     query = {
         'state': order_type,
